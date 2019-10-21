@@ -5,8 +5,7 @@ oc new-project dc-prod --display-name='Production'
 
 # populate ci/cd project with jenkins (v3.7) (and pipeline?)
 oc project dc-cicd
-oc import-image jenkins:v3.7 --from="registry.access.redhat.com/openshift3/jenkins-2-rhel7:v3.7" --confirm
-oc new-app jenkins-persistent -p NAMESPACE=dc-cicd -p JENKINS_IMAGE_STREAM_TAG=jenkins:v3.7 -p MEMORY_LIMIT=1Gi
+oc new-app jenkins-persistent
 oc create -f dc-pipeline.yaml -n dc-cicd
 
 # setup permissions to allow tagging
@@ -20,18 +19,18 @@ oc new-app https://github.com/deversmann/openshift-workshops.git --context-dir=/
 oc expose svc/metro
 oc rollout status dc/metro --watch
 
-# tah latest build fo blue and green
-oc tag dc-dev/metro:latest dc-prod/metro:prod-blue
-oc tag dc-dev/metro:latest dc-prod/metro:prod-green
+# the latest build for blue and green
+oc tag dc-dev/metro:latest dc-prod/metro-blue:prod-blue
+oc tag dc-dev/metro:latest dc-prod/metro-green:prod-green
 
 # create deployments in prod for blue and green
 oc project dc-prod
-oc new-app -i metro:prod-green --name=metro-green
-oc new-app -i metro:prod-blue --name=metro-blue
+oc new-app -i metro-green:prod-green --name=metro-green
+oc new-app -i metro-blue:prod-blue --name=metro-blue
 
 # remove deployment triggers
-oc set triggers dc/metro-blue --remove-all
-oc set triggers dc/metro-green --remove-all
+oc set triggers dc/metro-blue --manual
+oc set triggers dc/metro-green --manual
 
 # expose blue and green on prod and pre-prod urls and preset percentages
 oc expose svc/metro-green --name=metro-prod
