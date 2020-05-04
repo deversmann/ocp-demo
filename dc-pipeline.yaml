@@ -58,6 +58,9 @@ spec:
               }
             }
             stage('Approve Go Live') {
+              when { 
+                expression { env.DEMO_SKIP_GOLIVE != 'true'}
+              }
               steps {
                 timeout(time:15, unit:'MINUTES') {
                   input message: "Go Live in Production (switch to new version)?", ok: "Go Live"

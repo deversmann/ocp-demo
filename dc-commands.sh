@@ -35,9 +35,9 @@ oc set triggers dc/metro-green --manual
 # expose blue and green on prod and pre-prod urls and preset percentages
 oc expose svc/metro-green --name=metro-prod
 oc expose svc/metro-blue --name=metro-pre-prod
-oc set route-backends metro-prod metro-blue=100 metro-green=0
-oc set route-backends metro-pre-prod metro-blue=0 metro-green=100
+oc set route-backends metro-prod metro-blue=0 metro-green=100
+oc set route-backends metro-pre-prod metro-blue=100 metro-green=0
 
 oc project dc-cicd
-oc start-build dc-pipeline --wait=true
+oc start-build dc-pipeline --wait=true --env=DEMO_SKIP_GOLIVE=true
 oc start-build dc-pipeline --list-webhooks=github
